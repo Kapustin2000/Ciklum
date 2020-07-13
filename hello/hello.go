@@ -29,14 +29,6 @@ func (pars *Parser) get(uri string) Parser {
 	var responseObject Parser
 	json.Unmarshal(responseData, &responseObject)
 
-	fmt.Println(responseObject.Status)
-	fmt.Println(len(responseObject.Response.Items))
-
-	for i := 0; i < len(responseObject.Response.Items); i++ {
-		fmt.Println(responseObject.Response.Items[i].Url)
-
-	}
-
 	return responseObject
 }
 
@@ -51,19 +43,22 @@ type Item struct {
 	Url          string `json:"url"`
 	Title        string `json:"title"`
 	CleanImage   string `json:"cleanImage"`
+
+	//Contentmarketing API structure
+	CommercialPartner string `json:"commercialPartner,omitempty"`
+	LogoURL           string `json:"logoURL,omitempty"`
 }
 
 func main() {
 
 	parser := Parser{}
-	parser.get("https://storage.googleapis.com/aller-structure-task/articles.json")
 
-	//articlesUri, exists := os.LookupEnv("https://storage.googleapis.com/aller-structure-task/articles.json")
-	//
-	//if exists {
-	//    parser.get(articlesUri)
-	//
-	//    //  fmt.Println(articlesData)
-	//}
+	articlesData := parser.get("https://storage.googleapis.com/aller-structure-task/articles.json")
+
+	fmt.Println("Articles Status", articlesData.Status)
+
+	marketingData := parser.get("https://storage.googleapis.com/aller-structure-task/contentmarketing.json")
+
+	fmt.Println("Marketing Status", marketingData.Status)
 
 }
