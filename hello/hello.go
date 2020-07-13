@@ -1,97 +1,69 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-    "github.com/joho/godotenv"
-	"os"
-	"net/http"
 	"io/ioutil"
-    "encoding/json"
+	"log"
+	"net/http"
+	"os"
 )
 
-
-
-func init() {
-    // loads values from .env into the system
-    if err := godotenv.Load(); err != nil {
-        fmt.Println("No .env file found")
-    }
-}
-
-
-
-
-/*  Parser (maybe move to subfolder  */
-
 type Parser struct {
-    structure struct{
-        Items []struct {
-            Name              string
-            Count             int
-            Is_required       bool
-            Is_moderator_only bool
-            Has_synonyms      bool
-        }
-    }
+	Status   int      `json:"httpStatus"`
+	Response Response `json:"response"`
 }
 
-func (pars *Parser) get(uri string) string {
-    var data struct {
-        Items []struct {
-            Name              string
-            Count             int
-            Is_required       bool
-            Is_moderator_only bool
-            Has_synonyms      bool
-        }
-    }
+func (pars *Parser) get(uri string) Parser {
+	response, err := http.Get(uri)
+	if err != nil {
+		fmt.Print(err.Error())
+		os.Exit(1)
+	}
 
+	responseData, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    resp, err := http.Get(uri)
+	var responseObject Parser
+	json.Unmarshal(responseData, &responseObject)
 
-    if err != nil {
-        fmt.Println(err)
-    }
+	fmt.Println(responseObject.Status)
+	fmt.Println(len(responseObject.Response.Items))
 
-    defer resp.Body.Close()
+	for i := 0; i < len(responseObject.Response.Items); i++ {
+		fmt.Println(responseObject.Response.Items[i].Url)
 
-    body, err := ioutil.ReadAll(resp.Body)
+	}
 
-    if err != nil {
-       fmt.Println(err)
-    }
-
-    dec := json.NewDecoder(resp.Body)
-    dec.Decode(&data)
-
-
-    return string(body)
+	return responseObject
 }
 
+type Response struct {
+	Items []Item `json:"items"`
+}
 
-
-
-
-/* */
-
-
+type Item struct {
+	Type         string `json:"type"`
+	HarvesterId  string `json:"harvesterId"`
+	CerebroScore int    `json:"cerebro-score"`
+	Url          string `json:"url"`
+	Title        string `json:"title"`
+	CleanImage   string `json:"cleanImage"`
+}
 
 func main() {
 
-    parser := Parser{}
+	parser := Parser{}
+	parser.get("https://storage.googleapis.com/aller-structure-task/articles.json")
 
-
-    articlesUri, exists := os.LookupEnv("ARTICLES_URI")
-
-    if exists {
-          parser.get(articlesUri)
-
-      //  fmt.Println(articlesData)
-    }
-
+	//articlesUri, exists := os.LookupEnv("https://storage.googleapis.com/aller-structure-task/articles.json")
+	//
+	//if exists {
+	//    parser.get(articlesUri)
+	//
+	//    //  fmt.Println(articlesData)
+	//}
 
 }
-
-
-
-
