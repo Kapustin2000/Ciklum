@@ -5,6 +5,11 @@ import (
 	"fmt"
 )
 
+type Result struct {
+	Articles         []parser.Item
+	ContentMarketing []parser.Item
+}
+
 func main() {
 
 	parser := parser.Parser{}
@@ -16,5 +21,11 @@ func main() {
 	marketingData := parser.GET("https://storage.googleapis.com/aller-structure-task/contentmarketing.json")
 
 	fmt.Println("Marketing Status", marketingData.Status)
+
+	//fmt.Println(marketingData.Response.Items[6])
+
+	result := Result{}
+
+	result.Articles = articlesData.Response.Items[1:4]
 
 }
