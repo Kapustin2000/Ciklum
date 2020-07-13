@@ -10,10 +10,12 @@ import (
 )
 
 type Parser struct {
+	Status   int      `json:"httpStatus"`
+	Response Response `json:"response"`
 }
 
-func (pars *Parser) get(uri string) Response {
-	response, err := http.Get("http://pokeapi.co/api/v2/pokedex/kanto/")
+func (pars *Parser) GET(uri string) Parser {
+	response, err := http.Get(uri)
 	if err != nil {
 		fmt.Print(err.Error())
 		os.Exit(1)
@@ -24,34 +26,25 @@ func (pars *Parser) get(uri string) Response {
 		log.Fatal(err)
 	}
 
-	var responseObject Response
+	var responseObject Parser
 	json.Unmarshal(responseData, &responseObject)
-
-	fmt.Println(responseObject.Status)
-	fmt.Println(len(responseObject.Items))
 
 	return responseObject
 }
 
 type Response struct {
-	Status int    `json:"httpStatus"`
-	Items  []Item `json:"items"`
+	Items []Item `json:"items"`
 }
 
 type Item struct {
-	Type string `json:"type"`
-}
+	Type         string `json:"type"`
+	HarvesterId  string `json:"harvesterId"`
+	CerebroScore int    `json:"cerebro-score"`
+	Url          string `json:"url"`
+	Title        string `json:"title"`
+	CleanImage   string `json:"cleanImage"`
 
-func main() {
-
-	parser := Parser{}
-
-	articlesUri, exists := os.LookupEnv("ARTICLES_URI")
-
-	if exists {
-		parser.get(articlesUri)
-
-		//  fmt.Println(articlesData)
-	}
-
+	//Contentmarketing API structure
+	CommercialPartner string `json:"commercialPartner,omitempty"`
+	LogoURL           string `json:"logoURL,omitempty"`
 }
