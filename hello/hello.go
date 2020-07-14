@@ -2,30 +2,24 @@ package main
 
 import (
 	"./parser"
+	"./result"
 	"fmt"
 )
 
-type Result struct {
-	Articles         []parser.Item
-	ContentMarketing []parser.Item
-}
-
 func main() {
+
+	const PAGE = 500
 
 	parser := parser.Parser{}
 
-	articlesData := parser.GET("https://storage.googleapis.com/aller-structure-task/articles.json")
+	articlesData := parser.GET("https://storage.googleapis.com/aller-structure-task/articles.json").Response.Items
 
-	fmt.Println("Articles Status", articlesData.Status)
+	marketingData := parser.GET("https://storage.googleapis.com/aller-structure-task/contentmarketing.json").Response.Items
 
-	marketingData := parser.GET("https://storage.googleapis.com/aller-structure-task/contentmarketing.json")
+	result := result.Result{}
 
-	fmt.Println("Marketing Status", marketingData.Status)
+	response := result.PrepareResponse(articlesData, marketingData, PAGE)
 
-	//fmt.Println(marketingData.Response.Items[6])
-
-	result := Result{}
-
-	result.Articles = articlesData.Response.Items[1:4]
+	fmt.Println(response)
 
 }
