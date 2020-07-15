@@ -7,8 +7,10 @@ import (
 )
 
 func main() {
-
-	const PAGE = 500
+	//Change this const value if you want to get next articles
+	const PAGE = 1
+	//Change this const value if you want to get more articles per call
+	const LIMIT = 5
 
 	parser := parser.Parser{}
 
@@ -18,7 +20,7 @@ func main() {
 
 	result := result.Result{}
 
-	response := result.PrepareResponse(articlesData, marketingData, PAGE)
+	response := result.PrepareResponse(articlesData, marketingData, PAGE, LIMIT)
 
 	fmt.Println(response)
 
